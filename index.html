@@ -406,6 +406,10 @@
         <div class="stat-num" id="statJava">0%</div>
         <div class="stat-label">Java / CS Core</div>
       </div>
+      <div class="stat-card" style="--c: #c084fc">
+        <div class="stat-num" id="statLLD">0%</div>
+        <div class="stat-label">LLD Progress</div>
+      </div>
     </div>
 
     <div class="master-progress">
@@ -427,6 +431,7 @@
     <button class="tab-btn" data-section="database">🗄️ Database</button>
     <button class="tab-btn" data-section="os">⚙️ OS</button>
     <button class="tab-btn" data-section="networking">🌐 Networking</button>
+    <button class="tab-btn" data-section="lld">🧩 LLD</button>
   </div>
 
   <!-- ===================== DSA SECTION ===================== -->
@@ -498,6 +503,19 @@
       <button class="reset-section" data-reset="os">↺ Reset</button>
     </div>
     <div class="topic-grid" id="os-grid"></div>
+  </div>
+
+  <!-- ===================== LLD ===================== -->
+  <div class="section" id="section-lld">
+    <div class="section-header">
+      <div class="section-icon">🧩</div>
+      <div>
+        <div class="section-title">Low Level Design (LLD)</div>
+        <div class="section-desc">SOLID · Design Patterns · OOP Modeling · Classic LLD Problems</div>
+      </div>
+      <button class="reset-section" data-reset="lld">↺ Reset</button>
+    </div>
+    <div class="topic-grid" id="lld-grid"></div>
   </div>
 
   <!-- ===================== NETWORKING ===================== -->
@@ -1055,6 +1073,248 @@ const DATA = {
     ]
   },
 
+  lld: {
+    weekly: [
+      {
+        id: 'lld-solid',
+        title: 'SOLID Principles',
+        badge: 'weekly',
+        items: [
+          'S — Single Responsibility Principle (SRP)',
+          'O — Open/Closed Principle (OCP)',
+          'L — Liskov Substitution Principle (LSP)',
+          'I — Interface Segregation Principle (ISP)',
+          'D — Dependency Inversion Principle (DIP)',
+          'Identifying violations in code',
+          'Refactoring to follow SOLID',
+        ]
+      },
+      {
+        id: 'lld-creational',
+        title: 'Creational Design Patterns',
+        badge: 'weekly',
+        items: [
+          'Singleton — thread-safe (double-checked locking, Bill Pugh)',
+          'Factory Method — subclass decides instantiation',
+          'Abstract Factory — family of related objects',
+          'Builder — step-by-step object construction',
+          'Prototype — clone existing object',
+          'Object Pool Pattern',
+        ]
+      },
+      {
+        id: 'lld-structural',
+        title: 'Structural Design Patterns',
+        badge: 'weekly',
+        items: [
+          'Adapter — incompatible interfaces bridge',
+          'Bridge — abstraction & implementation separate',
+          'Composite — tree structure of objects',
+          'Decorator — add behavior dynamically',
+          'Facade — simplified interface to subsystem',
+          'Flyweight — shared objects for memory efficiency',
+          'Proxy — surrogate / placeholder object',
+        ]
+      },
+      {
+        id: 'lld-behavioral',
+        title: 'Behavioral Design Patterns',
+        badge: 'weekly',
+        items: [
+          'Observer — publish/subscribe',
+          'Strategy — interchangeable algorithms',
+          'Command — encapsulate requests as objects',
+          'Chain of Responsibility',
+          'Iterator — sequential access',
+          'Mediator — centralized communication',
+          'Memento — undo/restore state',
+          'State — behavior based on internal state',
+          'Template Method — skeleton algorithm',
+          'Visitor — add ops without changing classes',
+          'Interpreter pattern',
+        ]
+      },
+      {
+        id: 'lld-oop-modeling',
+        title: 'OOP Modeling Skills',
+        badge: 'weekly',
+        items: [
+          'Identify classes, attributes, methods from requirements',
+          'Association, Aggregation, Composition differences',
+          'Dependency vs. Association',
+          'UML Class Diagram basics',
+          'UML Sequence Diagram basics',
+          'Inheritance vs. Composition (prefer composition)',
+          'Designing for extensibility & maintainability',
+          'Interface-based programming',
+          'Encapsulation best practices',
+        ]
+      },
+    ],
+    monthly: [
+      {
+        id: 'lld-parking-lot',
+        title: 'Classic LLD: Parking Lot',
+        badge: 'monthly',
+        items: [
+          'Entities: ParkingLot, Floor, Spot, Vehicle, Ticket',
+          'Vehicle types: Bike, Car, Truck (inheritance)',
+          'Spot types: Small, Medium, Large',
+          'Parking strategy (nearest spot, floor-wise)',
+          'Entry/Exit gates & ticket generation',
+          'Payment system integration',
+          'Concurrency: thread-safe spot allocation',
+        ]
+      },
+      {
+        id: 'lld-elevator',
+        title: 'Classic LLD: Elevator System',
+        badge: 'monthly',
+        items: [
+          'Entities: ElevatorSystem, Elevator, Floor, Request',
+          'Scheduling algorithms: SCAN, LOOK, FCFS',
+          'Direction state machine (UP, DOWN, IDLE)',
+          'Internal vs external requests handling',
+          'Multiple elevator coordination',
+          'Emergency & maintenance states',
+        ]
+      },
+      {
+        id: 'lld-hotel',
+        title: 'Classic LLD: Hotel Booking',
+        badge: 'monthly',
+        items: [
+          'Entities: Hotel, Room, Guest, Booking, Payment',
+          'Room types & pricing strategy',
+          'Booking lifecycle (PENDING → CONFIRMED → CHECKED_IN → CHECKED_OUT)',
+          'Availability search & date range logic',
+          'Cancellation & refund policy',
+          'Concurrency: double booking prevention',
+        ]
+      },
+      {
+        id: 'lld-library',
+        title: 'Classic LLD: Library Management',
+        badge: 'monthly',
+        items: [
+          'Entities: Library, Book, BookItem, Member, Librarian',
+          'Search by title, author, subject',
+          'Issue, return, renew flow',
+          'Fine calculation for late returns',
+          'Reservation queue for unavailable books',
+          'Notification on book availability',
+        ]
+      },
+      {
+        id: 'lld-chess',
+        title: 'Classic LLD: Chess Game',
+        badge: 'monthly',
+        items: [
+          'Entities: Board, Cell, Piece, Player, Game',
+          'Piece hierarchy: King, Queen, Rook, Bishop, Knight, Pawn',
+          'Move validation per piece type',
+          'Check, Checkmate, Stalemate detection',
+          'Game state management',
+          'Special moves: Castling, En passant, Promotion',
+        ]
+      },
+      {
+        id: 'lld-atm',
+        title: 'Classic LLD: ATM Machine',
+        badge: 'monthly',
+        items: [
+          'Entities: ATM, Card, Account, Transaction, CashDispenser',
+          'State machine: IDLE → CARD_INSERTED → PIN_ENTERED → TRANSACTION',
+          'PIN validation & retry limit',
+          'Cash withdrawal, balance check, deposit',
+          'Denomination selection for cash dispensing',
+          'Network failure & rollback handling',
+        ]
+      },
+      {
+        id: 'lld-splitwise',
+        title: 'Classic LLD: Splitwise / Expense Sharing',
+        badge: 'monthly',
+        items: [
+          'Entities: User, Group, Expense, Split, Balance',
+          'Split types: Equal, Exact, Percentage, Shares',
+          'Balance calculation between users',
+          'Simplify debts algorithm',
+          'Expense categories & notes',
+          'Settlement & payment recording',
+        ]
+      },
+      {
+        id: 'lld-bookmyshow',
+        title: 'Classic LLD: BookMyShow / Movie Booking',
+        badge: 'monthly',
+        items: [
+          'Entities: Movie, Theatre, Screen, Show, Seat, Booking',
+          'Seat types: Recliner, Premium, Normal',
+          'Seat selection & locking (concurrency)',
+          'Payment & booking confirmation',
+          'Cancellation policy',
+          'Search: by city, movie, date',
+          'Notification (SMS, Email)',
+        ]
+      },
+      {
+        id: 'lld-lru-cache',
+        title: 'Classic LLD: Cache Designs',
+        badge: 'monthly',
+        items: [
+          'LRU Cache — HashMap + DoublyLinkedList',
+          'LFU Cache — frequency buckets',
+          'TTL-based expiry cache',
+          'Thread-safe cache implementation',
+          'Eviction policy abstraction (Strategy pattern)',
+          'Write-through vs Write-back cache',
+        ]
+      },
+      {
+        id: 'lld-vending',
+        title: 'Classic LLD: Vending Machine',
+        badge: 'monthly',
+        items: [
+          'State pattern: IDLE, ITEM_SELECTED, PAYMENT, DISPENSING',
+          'Inventory management (items & quantity)',
+          'Coin/note handling & change return',
+          'Item selection & price validation',
+          'Refund & cancel flow',
+          'Admin: restock & maintenance mode',
+        ]
+      },
+      {
+        id: 'lld-uber',
+        title: 'Classic LLD: Cab Booking (Uber)',
+        badge: 'monthly',
+        items: [
+          'Entities: Rider, Driver, Trip, Location, Payment',
+          'Driver matching algorithm (nearest, rating)',
+          'Trip lifecycle: REQUESTED → ACCEPTED → ONGOING → COMPLETED',
+          'Real-time location updates',
+          'Surge pricing strategy pattern',
+          'Rating & feedback system',
+          'Cancellation & penalty',
+        ]
+      },
+      {
+        id: 'lld-logger',
+        title: 'Classic LLD: Logger / Rate Limiter',
+        badge: 'monthly',
+        items: [
+          'Log levels: DEBUG, INFO, WARN, ERROR, FATAL',
+          'Multiple appenders: Console, File, DB (Observer)',
+          'Log formatter & layout',
+          'Async logging with queue',
+          'Rate Limiter: Token Bucket implementation',
+          'Rate Limiter: Sliding Window Log',
+          'Rate Limiter: Fixed Window Counter',
+        ]
+      },
+    ]
+  },
+
   networking: {
     weekly: [
       {
@@ -1321,6 +1581,7 @@ function updateStats() {
   document.getElementById('statDSA').textContent = sectionProgress('dsa') + '%';
   document.getElementById('statSD').textContent = sectionProgress('systemdesign') + '%';
   document.getElementById('statJava').textContent = (Math.round((sectionProgress('java') + sectionProgress('database') + sectionProgress('os') + sectionProgress('networking')) / 4)) + '%';
+  document.getElementById('statLLD').textContent = sectionProgress('lld') + '%';
   const mp = masterProgress();
   document.getElementById('masterPct').textContent = mp + '%';
   document.getElementById('masterFill').style.width = mp + '%';
@@ -1438,6 +1699,10 @@ if (savedTheme) {
 // ============================================================
 buildWeekStrip();
 updateStreak();
+renderGrid('dsa');
+// Pre-render other sections so reset works
+['systemdesign','java','database','os','networking','lld'].forEach(s => renderGrid(s));
+// Re-render active only
 renderGrid('dsa');
 updateStats();
 </script>
