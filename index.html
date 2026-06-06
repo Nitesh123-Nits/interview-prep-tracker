@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevPrep — Interview Revision Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3d;
+    --text: #e8e8f0;
+    --text-dim: #7070a0;
+    --text-muted: #404060;
+    --accent: #6c63ff;
+    --accent2: #00d9a3;
+    --accent3: #ff6b6b;
+    --accent4: #ffa94d;
+    --accent5: #74c0fc;
+    --glow: rgba(108,99,255,0.15);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  [data-theme="light"] {
+    --bg: #f0f0f8;
+    --surface: #ffffff;
+    --surface2: #e8e8f4;
+    --border: #d0d0e8;
+    --text: #1a1a2e;
+    --text-dim: #5050a0;
+    --text-muted: #9090c0;
+    --glow: rgba(108,99,255,0.08);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Instrument Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+    backdrop-filter: blur(12px);
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 1.3rem;
+    letter-spacing: -0.5px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+
+  .streak-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(255,165,0,0.12);
+    border: 1px solid rgba(255,165,0,0.3);
+    border-radius: 20px; padding: 5px 12px;
+    font-family: 'DM Mono', monospace; font-size: 0.78rem;
+    color: var(--accent4);
+  }
+
+  .theme-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    cursor: pointer; font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .theme-btn:hover { border-color: var(--accent); transform: scale(1.05); }
+
+  /* LAYOUT */
+  .container { max-width: 1280px; margin: 0 auto; padding: 32px 24px; }
+
+  /* HERO STATS */
+  .hero { margin-bottom: 36px; }
+  .hero-title {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    letter-spacing: -1px; margin-bottom: 6px;
+    line-height: 1.1;
+  }
+  .hero-sub { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 28px; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px; margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    position: relative; overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .stat-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: var(--c, var(--accent));
+  }
+  .stat-num {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 2rem; line-height: 1;
+    color: var(--c, var(--accent));
+  }
+  .stat-label { font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* MASTER PROGRESS BAR */
+  .master-progress {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 32px;
+  }
+  .mp-label {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px;
+  }
+  .mp-label span:first-child { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; }
+  .mp-pct { font-family: 'DM Mono', monospace; color: var(--accent); font-size: 1rem; font-weight: 500; }
+  .progress-track {
+    height: 10px; background: var(--surface2);
+    border-radius: 10px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 10px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 12px rgba(108,99,255,0.4);
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex; gap: 6px; margin-bottom: 28px;
+    overflow-x: auto; padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex-shrink: 0;
+    padding: 8px 18px; border-radius: 30px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-dim); font-size: 0.85rem;
+    cursor: pointer; transition: all 0.2s;
+    font-family: 'Instrument Sans', sans-serif; font-weight: 500;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); border-color: var(--accent); }
+  .tab-btn.active {
+    background: var(--accent); border-color: var(--accent);
+    color: #fff; box-shadow: 0 0 20px rgba(108,99,255,0.3);
+  }
+
+  /* SECTION */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* WEEK/MONTH TOGGLE */
+  .view-toggle {
+    display: flex; gap: 0; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); overflow: hidden;
+    width: fit-content; margin-bottom: 24px;
+  }
+  .view-btn {
+    padding: 7px 18px; border: none;
+    background: transparent; color: var(--text-dim);
+    font-size: 0.82rem; cursor: pointer;
+    transition: all 0.2s; font-family: 'DM Mono', monospace;
+    font-weight: 500;
+  }
+  .view-btn.active { background: var(--accent); color: #fff; }
+
+  /* TOPIC GRID */
+  .topic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  .topic-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .topic-card:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 8px 32px var(--glow); }
+  .topic-card.completed { border-color: var(--accent2); }
+  .topic-card.completed::after {
+    content: ''; position: absolute; inset: 0;
+    border-radius: var(--radius);
+    background: rgba(0,217,163,0.03);
+    pointer-events: none;
+  }
+
+  .card-header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 12px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 0.95rem; line-height: 1.3;
+  }
+  .card-badge {
+    flex-shrink: 0;
+    padding: 3px 8px; border-radius: 20px;
+    font-family: 'DM Mono', monospace; font-size: 0.68rem;
+    font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .badge-weekly { background: rgba(108,99,255,0.15); color: var(--accent); }
+  .badge-monthly { background: rgba(0,217,163,0.15); color: var(--accent2); }
+  .badge-both { background: rgba(255,165,0,0.15); color: var(--accent4); }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .checklist li {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px; border-radius: var(--radius-sm);
+    cursor: pointer; transition: background 0.15s;
+    user-select: none;
+  }
+  .checklist li:hover { background: var(--surface2); }
+  .check-box {
+    width: 18px; height: 18px; border-radius: 5px;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0; display: flex; align-items: center;
+    justify-content: center; transition: all 0.2s;
+    background: transparent;
+  }
+  .checklist li.done .check-box {
+    background: var(--accent2); border-color: var(--accent2);
+  }
+  .check-icon { display: none; font-size: 0.65rem; color: #000; font-weight: 700; }
+  .checklist li.done .check-icon { display: block; }
+  .check-label {
+    font-size: 0.83rem; color: var(--text-dim);
+    transition: all 0.2s; flex: 1; line-height: 1.4;
+  }
+  .checklist li.done .check-label {
+    color: var(--text-muted); text-decoration: line-through;
+  }
+
+  /* CARD PROGRESS */
+  .card-progress {
+    margin-top: 14px; padding-top: 14px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .card-progress-track {
+    flex: 1; height: 4px; background: var(--surface2);
+    border-radius: 4px; overflow: hidden;
+  }
+  .card-progress-fill {
+    height: 100%; border-radius: 4px;
+    background: var(--accent2);
+    transition: width 0.4s ease;
+  }
+  .card-pct {
+    font-family: 'DM Mono', monospace; font-size: 0.72rem;
+    color: var(--text-dim); min-width: 30px; text-align: right;
+  }
+
+  /* CATEGORY LABEL */
+  .cat-label {
+    font-family: 'DM Mono', monospace; font-size: 0.7rem;
+    color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+
+  /* SECTION HEADER */
+  .section-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+  }
+  .section-icon {
+    width: 38px; height: 38px; border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    background: var(--surface2);
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 1.3rem; letter-spacing: -0.3px;
+  }
+  .section-desc { font-size: 0.83rem; color: var(--text-dim); margin-top: 2px; }
+
+  /* RESET BTN */
+  .reset-section {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 20px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--text-dim); font-size: 0.78rem; cursor: pointer;
+    transition: all 0.2s; font-family: 'Instrument Sans', sans-serif;
+    margin-left: auto;
+  }
+  .reset-section:hover { border-color: var(--accent3); color: var(--accent3); }
+
+  /* WEEKLY CALENDAR */
+  .week-strip {
+    display: flex; gap: 8px; margin-bottom: 28px; overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .week-strip::-webkit-scrollbar { display: none; }
+  .week-day {
+    flex-shrink: 0; width: 52px;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 10px 6px; border-radius: var(--radius-sm);
+    background: var(--surface); border: 1px solid var(--border);
+    font-size: 0.72rem; gap: 4px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .week-day.today {
+    border-color: var(--accent); background: rgba(108,99,255,0.08);
+  }
+  .week-day .wd-name { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; font-family: 'DM Mono', monospace; }
+  .week-day .wd-num { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; }
+  .week-day .wd-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); }
+  .week-day.has-activity .wd-dot { background: var(--accent2); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .container { padding: 20px 16px; }
+    .topic-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    header { padding: 0 16px; }
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .topic-card { animation: fadeUp 0.35s ease both; }
+  .topic-card:nth-child(1) { animation-delay: 0.04s; }
+  .topic-card:nth-child(2) { animation-delay: 0.08s; }
+  .topic-card:nth-child(3) { animation-delay: 0.12s; }
+  .topic-card:nth-child(4) { animation-delay: 0.16s; }
+  .topic-card:nth-child(5) { animation-delay: 0.2s; }
+  .topic-card:nth-child(6) { animation-delay: 0.24s; }
+
+  /* CONFETTI POP */
+  @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+  .pop { animation: pop 0.25s ease; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    DevPrep
+  </div>
+  <div class="header-right">
+    <div class="streak-badge" id="streakBadge">🔥 <span id="streakCount">0</span> day streak</div>
+    <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="hero">
+    <div class="hero-title">Interview Revision Tracker</div>
+    <div class="hero-sub">Stay consistent. Revise weekly. Ace every interview. 🎯</div>
+
+    <!-- WEEK CALENDAR -->
+    <div class="week-strip" id="weekStrip"></div>
+
+    <!-- STATS -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card" style="--c: var(--accent)">
+        <div class="stat-num" id="statTotal">0</div>
+        <div class="stat-label">Topics Completed</div>
+      </div>
+      <div class="stat-card" style="--c: var(--accent2)">
+        <div class="stat-num" id="statDSA">0%</div>
+        <div class="stat-label">DSA Progress</div>
+      </div>
+      <div class="stat-card" style="--c: var(--accent4)">
+        <div class="stat-num" id="statSD">0%</div>
+        <div class="stat-label">System Design</div>
+      </div>
+      <div class="stat-card" style="--c: var(--accent3)">
+        <div class="stat-num" id="statJava">0%</div>
+        <div class="stat-label">Java / CS Core</div>
+      </div>
+    </div>
+
+    <div class="master-progress">
+      <div class="mp-label">
+        <span>Overall Revision Progress</span>
+        <span class="mp-pct" id="masterPct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="masterFill" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" data-section="dsa">📊 DSA</button>
+    <button class="tab-btn" data-section="systemdesign">🏗️ System Design</button>
+    <button class="tab-btn" data-section="java">☕ Java</button>
+    <button class="tab-btn" data-section="database">🗄️ Database</button>
+    <button class="tab-btn" data-section="os">⚙️ OS</button>
+    <button class="tab-btn" data-section="networking">🌐 Networking</button>
+  </div>
+
+  <!-- ===================== DSA SECTION ===================== -->
+  <div class="section active" id="section-dsa">
+    <div class="section-header">
+      <div class="section-icon">📊</div>
+      <div>
+        <div class="section-title">Data Structures & Algorithms</div>
+        <div class="section-desc">Graph basics · Tries · Trees · Patterns · Common Questions</div>
+      </div>
+      <button class="reset-section" data-reset="dsa">↺ Reset</button>
+    </div>
+
+    <div class="view-toggle">
+      <button class="view-btn active" data-view="weekly">Weekly</button>
+      <button class="view-btn" data-view="monthly">Monthly</button>
+    </div>
+
+    <div class="topic-grid" id="dsa-grid"></div>
+  </div>
+
+  <!-- ===================== SYSTEM DESIGN ===================== -->
+  <div class="section" id="section-systemdesign">
+    <div class="section-header">
+      <div class="section-icon">🏗️</div>
+      <div>
+        <div class="section-title">System Design</div>
+        <div class="section-desc">Components · Core Concepts · Trade-offs · Patterns</div>
+      </div>
+      <button class="reset-section" data-reset="systemdesign">↺ Reset</button>
+    </div>
+    <div class="topic-grid" id="systemdesign-grid"></div>
+  </div>
+
+  <!-- ===================== JAVA ===================== -->
+  <div class="section" id="section-java">
+    <div class="section-header">
+      <div class="section-icon">☕</div>
+      <div>
+        <div class="section-title">Java Core Concepts</div>
+        <div class="section-desc">OOP · Collections · Concurrency · JVM · Spring</div>
+      </div>
+      <button class="reset-section" data-reset="java">↺ Reset</button>
+    </div>
+    <div class="topic-grid" id="java-grid"></div>
+  </div>
+
+  <!-- ===================== DATABASE ===================== -->
+  <div class="section" id="section-database">
+    <div class="section-header">
+      <div class="section-icon">🗄️</div>
+      <div>
+        <div class="section-title">Database Concepts</div>
+        <div class="section-desc">SQL · NoSQL · Indexing · Transactions · Design</div>
+      </div>
+      <button class="reset-section" data-reset="database">↺ Reset</button>
+    </div>
+    <div class="topic-grid" id="database-grid"></div>
+  </div>
+
+  <!-- ===================== OS ===================== -->
+  <div class="section" id="section-os">
+    <div class="section-header">
+      <div class="section-icon">⚙️</div>
+      <div>
+        <div class="section-title">Operating Systems</div>
+        <div class="section-desc">Processes · Memory · Scheduling · Deadlocks · I/O</div>
+      </div>
+      <button class="reset-section" data-reset="os">↺ Reset</button>
+    </div>
+    <div class="topic-grid" id="os-grid"></div>
+  </div>
+
+  <!-- ===================== NETWORKING ===================== -->
+  <div class="section" id="section-networking">
+    <div class="section-header">
+      <div class="section-icon">🌐</div>
+      <div>
+        <div class="section-title">Computer Networking</div>
+        <div class="section-desc">TCP/IP · HTTP · DNS · Security · Protocols</div>
+      </div>
+      <button class="reset-section" data-reset="networking">↺ Reset</button>
+    </div>
+    <div class="topic-grid" id="networking-grid"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const DATA = {
+  dsa: {
+    weekly: [
+      {
+        id: 'graph-basics',
+        title: 'Graph Fundamentals',
+        badge: 'weekly',
+        items: [
+          'Types: Directed, Undirected, Weighted, DAG',
+          'Representation: Adjacency List vs Matrix',
+          'BFS — level-order traversal',
+          'DFS — recursive & iterative',
+          'Cycle detection (directed & undirected)',
+          'Topological Sort (Kahn\'s & DFS)',
+          'Connected Components',
+          'Bipartite Graph check',
+        ]
+      },
+      {
+        id: 'graph-advanced',
+        title: 'Advanced Graph Algorithms',
+        badge: 'weekly',
+        items: [
+          'Dijkstra\'s Shortest Path',
+          'Bellman-Ford Algorithm',
+          'Floyd-Warshall (All-pairs SP)',
+          'Prim\'s Minimum Spanning Tree',
+          'Kruskal\'s MST + Union-Find',
+          'Strongly Connected Components (Kosaraju)',
+          'Bridges & Articulation Points',
+          'Tarjan\'s Algorithm',
+        ]
+      },
+      {
+        id: 'trie',
+        title: 'Trie Data Structure',
+        badge: 'weekly',
+        items: [
+          'Trie Node structure & insertion',
+          'Search & prefix search',
+          'Delete from Trie',
+          'Count words with given prefix',
+          'Longest common prefix',
+          'Auto-complete implementation',
+          'Word Search II (Trie + backtrack)',
+        ]
+      },
+      {
+        id: 'trees',
+        title: 'Trees & Binary Trees',
+        badge: 'weekly',
+        items: [
+          'Inorder, Preorder, Postorder traversal',
+          'Level-order (BFS) traversal',
+          'Height & Diameter of tree',
+          'Lowest Common Ancestor',
+          'Binary Search Tree operations',
+          'AVL Tree rotations concept',
+          'Segment Tree basics',
+          'Fenwick Tree (BIT)',
+        ]
+      },
+      {
+        id: 'patterns',
+        title: 'DSA Patterns — Revision',
+        badge: 'weekly',
+        items: [
+          'Two Pointers',
+          'Sliding Window (fixed & variable)',
+          'Fast & Slow Pointers',
+          'Merge Intervals',
+          'Cyclic Sort',
+          'In-place Linked List Reversal',
+          'BFS for tree/graph levels',
+          'Two Heaps (min + max)',
+          'Subsets / Backtracking',
+          'Modified Binary Search',
+          'Top K elements (Heap)',
+          'K-way Merge',
+          'Dynamic Programming patterns',
+          'Monotonic Stack/Queue',
+        ]
+      },
+      {
+        id: 'common-questions',
+        title: 'Common DSA Questions',
+        badge: 'weekly',
+        items: [
+          'Two Sum / 3Sum / 4Sum',
+          'Longest Substring Without Repeat',
+          'Max Subarray (Kadane\'s)',
+          'Merge Intervals',
+          'Word Ladder (BFS)',
+          'Number of Islands',
+          'Clone Graph',
+          'Course Schedule (Topo sort)',
+          'Coin Change (DP)',
+          'Longest Common Subsequence',
+          'Serialize & Deserialize Tree',
+          'LRU Cache',
+          'Design Twitter / News Feed',
+        ]
+      }
+    ],
+    monthly: [
+      {
+        id: 'dp-deep',
+        title: 'Dynamic Programming — Deep Dive',
+        badge: 'monthly',
+        items: [
+          '0/1 Knapsack & variations',
+          'Unbounded Knapsack',
+          'Longest Increasing Subsequence',
+          'Matrix Chain Multiplication',
+          'Edit Distance (Levenshtein)',
+          'Egg Drop Problem',
+          'Palindrome DP problems',
+          'DP on Trees',
+          'Bitmask DP',
+        ]
+      },
+      {
+        id: 'sorting',
+        title: 'Sorting & Searching',
+        badge: 'monthly',
+        items: [
+          'Merge Sort (stable, O(n log n))',
+          'Quick Sort + partitioning',
+          'Heap Sort',
+          'Counting / Radix / Bucket Sort',
+          'Binary Search variations',
+          'Search in rotated sorted array',
+          'Find peak element',
+          'Kth Largest Element',
+        ]
+      }
+    ]
+  },
+
+  systemdesign: {
+    weekly: [
+      {
+        id: 'sd-components',
+        title: 'Core System Components',
+        badge: 'weekly',
+        items: [
+          'Load Balancer (L4 vs L7, Round Robin, Consistent Hashing)',
+          'API Gateway (rate limiting, auth, routing)',
+          'Reverse Proxy vs Forward Proxy',
+          'CDN — Content Delivery Network',
+          'DNS — Domain Name System & resolution',
+          'Web Servers & Application Servers',
+          'Message Queues (Kafka, RabbitMQ, SQS)',
+          'Cache (Redis, Memcached — read/write patterns)',
+          'Databases (SQL vs NoSQL — when to use)',
+          'Blob/Object Storage (S3)',
+          'Search (Elasticsearch)',
+          'Service Mesh & Service Discovery',
+        ]
+      },
+      {
+        id: 'sd-core-concepts',
+        title: 'Core System Design Concepts',
+        badge: 'weekly',
+        items: [
+          'Horizontal vs Vertical Scaling',
+          'CAP Theorem (Consistency, Availability, Partition Tolerance)',
+          'ACID vs BASE properties',
+          'Strong vs Eventual Consistency',
+          'Sharding & Partitioning strategies',
+          'Replication (leader-follower, multi-leader)',
+          'Indexing strategies (B-tree, LSM)',
+          'Connection Pooling',
+          'Circuit Breaker Pattern',
+          'Retry with Exponential Backoff',
+          'Rate Limiting algorithms (Token Bucket, Leaky Bucket)',
+          'Idempotency in APIs',
+        ]
+      },
+      {
+        id: 'sd-tradeoffs',
+        title: 'Trade-offs & Failures',
+        badge: 'weekly',
+        items: [
+          'Single Point of Failure elimination',
+          'Failover strategies (active-passive, active-active)',
+          'Data consistency in distributed systems',
+          'Read-heavy vs Write-heavy optimization',
+          'Latency vs Throughput',
+          'Synchronous vs Asynchronous processing',
+          'Microservices vs Monolith trade-offs',
+          'Event-driven architecture',
+          'Saga Pattern for distributed transactions',
+          'CQRS (Command Query Responsibility Segregation)',
+        ]
+      },
+      {
+        id: 'sd-estimation',
+        title: 'Capacity Estimation & Math',
+        badge: 'weekly',
+        items: [
+          'Back-of-envelope: QPS calculation',
+          'Storage estimation (bytes → TB)',
+          'Memory estimation for cache',
+          'Bandwidth estimation',
+          'Read/Write ratio analysis',
+          'Peak load vs average load',
+        ]
+      },
+      {
+        id: 'sd-patterns',
+        title: 'Design Patterns',
+        badge: 'weekly',
+        items: [
+          'URL Shortener (Hashing, Base62)',
+          'Distributed Key-Value Store',
+          'Feed / Timeline system',
+          'Notification system (Push/Pull)',
+          'File upload / Video streaming',
+          'Rate limiter design',
+          'Distributed ID generator (Snowflake)',
+          'Search Autocomplete',
+          'Web Crawler design',
+          'Distributed Cache design',
+        ]
+      }
+    ],
+    monthly: [
+      {
+        id: 'sd-deep',
+        title: 'System Design — Classic Systems',
+        badge: 'monthly',
+        items: [
+          'Design Twitter / Instagram',
+          'Design YouTube / Netflix',
+          'Design Uber / Google Maps',
+          'Design WhatsApp / Slack',
+          'Design Amazon / E-commerce',
+          'Design Google Drive / Dropbox',
+          'Design Google Search',
+          'Design a Distributed Locking System',
+        ]
+      }
+    ]
+  },
+
+  java: {
+    weekly: [
+      {
+        id: 'java-oop',
+        title: 'OOP Concepts',
+        badge: 'weekly',
+        items: [
+          'Encapsulation, Abstraction, Inheritance, Polymorphism',
+          'Method Overloading vs Overriding',
+          'Abstract class vs Interface',
+          'Default methods in Interface (Java 8)',
+          'Static & instance methods/variables',
+          'Constructor chaining (this, super)',
+          'Covariant return types',
+          'Object class methods (equals, hashCode, toString)',
+        ]
+      },
+      {
+        id: 'java-collections',
+        title: 'Collections Framework',
+        badge: 'weekly',
+        items: [
+          'ArrayList vs LinkedList',
+          'HashMap internals (hashing, collisions, rehashing)',
+          'LinkedHashMap vs TreeMap',
+          'HashSet vs TreeSet vs LinkedHashSet',
+          'PriorityQueue (min-heap usage)',
+          'ArrayDeque (Stack & Queue)',
+          'ConcurrentHashMap internals',
+          'Fail-fast vs Fail-safe iterators',
+          'Comparable vs Comparator',
+        ]
+      },
+      {
+        id: 'java-concurrency',
+        title: 'Multithreading & Concurrency',
+        badge: 'weekly',
+        items: [
+          'Thread lifecycle & states',
+          'Runnable vs Callable vs Thread',
+          'synchronized keyword & locks',
+          'volatile vs atomic variables',
+          'wait(), notify(), notifyAll()',
+          'ReentrantLock & ReadWriteLock',
+          'ExecutorService & thread pools',
+          'CountDownLatch, CyclicBarrier, Semaphore',
+          'CompletableFuture & async patterns',
+          'Deadlock, Livelock, Starvation',
+        ]
+      },
+      {
+        id: 'java-jvm',
+        title: 'JVM & Memory',
+        badge: 'weekly',
+        items: [
+          'JVM architecture (ClassLoader, JIT, GC)',
+          'Heap: Young Gen, Old Gen, Metaspace',
+          'Garbage Collection algorithms (G1, ZGC)',
+          'String pool & String internals',
+          'Stack vs Heap memory',
+          'Memory leaks — common causes',
+          'ClassLoader hierarchy',
+        ]
+      },
+      {
+        id: 'java-modern',
+        title: 'Modern Java (8–17)',
+        badge: 'weekly',
+        items: [
+          'Lambda expressions & functional interfaces',
+          'Stream API (map, filter, reduce, collect)',
+          'Optional class',
+          'Method references (::)',
+          'var keyword (Java 10)',
+          'Records (Java 14+)',
+          'Sealed classes (Java 17)',
+          'Pattern matching for instanceof',
+        ]
+      }
+    ],
+    monthly: [
+      {
+        id: 'java-design-patterns',
+        title: 'Design Patterns (GoF)',
+        badge: 'monthly',
+        items: [
+          'Singleton (thread-safe implementations)',
+          'Factory & Abstract Factory',
+          'Builder Pattern',
+          'Observer Pattern',
+          'Strategy Pattern',
+          'Decorator Pattern',
+          'Proxy Pattern',
+          'Command Pattern',
+          'Template Method',
+          'Iterator Pattern',
+        ]
+      },
+      {
+        id: 'spring',
+        title: 'Spring Boot / Framework',
+        badge: 'monthly',
+        items: [
+          'IoC Container & Dependency Injection',
+          'Bean scopes & lifecycle',
+          'Spring MVC request lifecycle',
+          'Spring Data JPA & repositories',
+          'Transaction management (@Transactional)',
+          'Spring Security basics',
+          'REST API best practices',
+          'Actuator, Profiles, Properties',
+        ]
+      }
+    ]
+  },
+
+  database: {
+    weekly: [
+      {
+        id: 'db-sql',
+        title: 'SQL Concepts',
+        badge: 'weekly',
+        items: [
+          'Joins: INNER, LEFT, RIGHT, FULL, CROSS, SELF',
+          'Subqueries & Correlated subqueries',
+          'Window functions (ROW_NUMBER, RANK, LAG, LEAD)',
+          'GROUP BY, HAVING, aggregate functions',
+          'CTEs (WITH clause)',
+          'EXPLAIN / Query execution plan',
+          'Views vs Materialized Views',
+          'Stored Procedures & Triggers',
+          'Transactions & Savepoints',
+        ]
+      },
+      {
+        id: 'db-indexing',
+        title: 'Indexing & Optimization',
+        badge: 'weekly',
+        items: [
+          'B-Tree index internals',
+          'Clustered vs Non-clustered index',
+          'Composite index & column order',
+          'Covering index',
+          'Index on NULL values behavior',
+          'When NOT to use indexes',
+          'Query optimization techniques',
+          'N+1 query problem',
+          'Connection pooling (HikariCP)',
+        ]
+      },
+      {
+        id: 'db-acid',
+        title: 'Transactions & Concurrency',
+        badge: 'weekly',
+        items: [
+          'ACID properties deep dive',
+          'Isolation levels (READ UNCOMMITTED → SERIALIZABLE)',
+          'Dirty read, Non-repeatable read, Phantom read',
+          'Optimistic vs Pessimistic locking',
+          'Deadlock detection & prevention',
+          'MVCC (Multi-Version Concurrency Control)',
+          'Two-phase locking (2PL)',
+        ]
+      },
+      {
+        id: 'db-nosql',
+        title: 'NoSQL Databases',
+        badge: 'weekly',
+        items: [
+          'Types: Document, Key-Value, Column, Graph',
+          'MongoDB: documents, collections, aggregation',
+          'Redis: data types, TTL, pub/sub, persistence',
+          'Cassandra: wide-column, ring architecture',
+          'HBase basics',
+          'Choosing SQL vs NoSQL',
+          'Eventual consistency in NoSQL',
+        ]
+      }
+    ],
+    monthly: [
+      {
+        id: 'db-design',
+        title: 'Database Design & Normalization',
+        badge: 'monthly',
+        items: [
+          'ER Diagrams & data modeling',
+          '1NF, 2NF, 3NF, BCNF',
+          'Denormalization trade-offs',
+          'Star schema vs Snowflake (Data Warehousing)',
+          'Partitioning & Sharding strategies',
+          'Database replication (sync vs async)',
+          'Backup & recovery strategies',
+        ]
+      }
+    ]
+  },
+
+  os: {
+    weekly: [
+      {
+        id: 'os-processes',
+        title: 'Processes & Threads',
+        badge: 'weekly',
+        items: [
+          'Process vs Thread vs Goroutine',
+          'Process Control Block (PCB)',
+          'Context switching',
+          'Inter-Process Communication (pipes, sockets, shared memory)',
+          'Zombie & Orphan processes',
+          'Fork, exec, wait system calls',
+          'Thread models (M:1, 1:1, M:N)',
+        ]
+      },
+      {
+        id: 'os-scheduling',
+        title: 'CPU Scheduling',
+        badge: 'weekly',
+        items: [
+          'FCFS, SJF, SRTF, Round Robin',
+          'Priority Scheduling',
+          'Multilevel Queue & Feedback Queue',
+          'Preemptive vs Non-preemptive',
+          'CPU burst vs I/O burst',
+          'Aging to prevent starvation',
+          'Real-time scheduling (EDF, RMS)',
+        ]
+      },
+      {
+        id: 'os-memory',
+        title: 'Memory Management',
+        badge: 'weekly',
+        items: [
+          'Logical vs Physical address space',
+          'Paging & page table',
+          'Segmentation',
+          'TLB (Translation Lookaside Buffer)',
+          'Demand paging & page faults',
+          'Page replacement: FIFO, LRU, Optimal',
+          'Thrashing',
+          'Virtual Memory concept',
+          'Memory fragmentation (internal/external)',
+        ]
+      },
+      {
+        id: 'os-deadlock',
+        title: 'Deadlocks & Synchronization',
+        badge: 'weekly',
+        items: [
+          'Deadlock conditions (Coffman conditions)',
+          'Deadlock prevention strategies',
+          'Deadlock avoidance (Banker\'s Algorithm)',
+          'Deadlock detection & recovery',
+          'Mutex, Semaphore, Monitor',
+          'Producer-Consumer problem',
+          'Readers-Writers problem',
+          'Dining Philosophers problem',
+        ]
+      },
+      {
+        id: 'os-filesystem',
+        title: 'File Systems & Storage',
+        badge: 'weekly',
+        items: [
+          'File system structure (inode)',
+          'FAT, ext4, NTFS, ZFS overview',
+          'Directory structure & path resolution',
+          'File permissions (rwx, chmod, chown)',
+          'Disk scheduling: FCFS, SSTF, SCAN, C-SCAN',
+          'RAID levels (0, 1, 5, 6, 10)',
+          'Page cache & buffer cache',
+        ]
+      }
+    ],
+    monthly: [
+      {
+        id: 'os-advanced',
+        title: 'Advanced OS Concepts',
+        badge: 'monthly',
+        items: [
+          'System calls deep dive',
+          'Kernel vs User space',
+          'Monolithic vs Microkernel',
+          'Hypervisors & Virtualization',
+          'Containers vs VMs (namespaces, cgroups)',
+          'Linux internals overview',
+          'Signal handling',
+        ]
+      }
+    ]
+  },
+
+  networking: {
+    weekly: [
+      {
+        id: 'net-osi',
+        title: 'OSI & TCP/IP Model',
+        badge: 'weekly',
+        items: [
+          'OSI 7 layers & responsibilities',
+          'TCP/IP 4-layer model',
+          'Data encapsulation & headers',
+          'PDUs at each layer (frame, packet, segment)',
+          'Loopback & broadcast addresses',
+        ]
+      },
+      {
+        id: 'net-tcp-udp',
+        title: 'TCP vs UDP',
+        badge: 'weekly',
+        items: [
+          'TCP 3-way handshake (SYN, SYN-ACK, ACK)',
+          'TCP 4-way teardown (FIN, ACK)',
+          'TCP flow control (sliding window)',
+          'TCP congestion control (slow start, AIMD)',
+          'UDP — connectionless, use cases',
+          'TCP vs UDP when to use what',
+          'Sequence numbers & ACKs',
+          'TCP TIME_WAIT state',
+        ]
+      },
+      {
+        id: 'net-http',
+        title: 'HTTP & Application Layer',
+        badge: 'weekly',
+        items: [
+          'HTTP/1.1 vs HTTP/2 vs HTTP/3',
+          'HTTP methods (GET, POST, PUT, PATCH, DELETE)',
+          'Status codes (2xx, 3xx, 4xx, 5xx)',
+          'HTTP headers (Cache-Control, Content-Type, CORS)',
+          'REST vs GraphQL vs gRPC',
+          'WebSockets & long polling',
+          'HTTPS & TLS handshake',
+          'Cookies, Sessions, JWT tokens',
+        ]
+      },
+      {
+        id: 'net-dns',
+        title: 'DNS & IP Addressing',
+        badge: 'weekly',
+        items: [
+          'DNS resolution process',
+          'DNS record types (A, AAAA, CNAME, MX, TXT, NS)',
+          'Recursive vs Authoritative DNS',
+          'DNS caching & TTL',
+          'IPv4 vs IPv6',
+          'Subnetting & CIDR notation',
+          'Private vs Public IP ranges',
+          'NAT (Network Address Translation)',
+        ]
+      },
+      {
+        id: 'net-security',
+        title: 'Network Security',
+        badge: 'weekly',
+        items: [
+          'TLS/SSL — symmetric & asymmetric encryption',
+          'Certificate Authority & PKI',
+          'OWASP Top 10 (XSS, CSRF, SQLi, etc.)',
+          'Firewalls & IDS/IPS',
+          'DDoS attacks & mitigation',
+          'VPN — tunneling protocols',
+          'OAuth 2.0 & OpenID Connect flow',
+          'CORS & SOP (Same-Origin Policy)',
+        ]
+      },
+      {
+        id: 'net-protocols',
+        title: 'Protocols & Infrastructure',
+        badge: 'weekly',
+        items: [
+          'ARP — IP to MAC resolution',
+          'ICMP — ping, traceroute',
+          'DHCP — dynamic IP assignment',
+          'SSH — secure shell',
+          'FTP vs SFTP vs SCP',
+          'SMTP, IMAP, POP3 (email)',
+          'Spanning Tree Protocol (STP)',
+          'BGP — inter-domain routing',
+        ]
+      }
+    ],
+    monthly: [
+      {
+        id: 'net-advanced',
+        title: 'Advanced Networking',
+        badge: 'monthly',
+        items: [
+          'Content Delivery Networks deep dive',
+          'Anycast vs Unicast vs Multicast',
+          'SDN (Software Defined Networking)',
+          'Network Function Virtualization',
+          'Kubernetes networking (pods, services, ingress)',
+          'Service mesh (Istio, Linkerd)',
+          'gRPC deep dive',
+        ]
+      }
+    ]
+  }
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let state = JSON.parse(localStorage.getItem('devprep_state') || '{}');
+let currentView = { dsa: 'weekly', systemdesign: 'weekly', java: 'weekly', database: 'weekly', os: 'weekly', networking: 'weekly' };
+let activeSection = 'dsa';
+
+function saveState() { localStorage.setItem('devprep_state', JSON.stringify(state)); }
+
+// ============================================================
+// RENDER
+// ============================================================
+function getItems(section) {
+  const d = DATA[section];
+  const view = currentView[section];
+  let items = [];
+  if (d.weekly) items = [...items, ...d.weekly];
+  if (view === 'monthly' && d.monthly) items = [...items, ...d.monthly];
+  if (view === 'weekly') return items.filter(c => c.badge === 'weekly');
+  return items;
+}
+
+function renderGrid(section) {
+  const grid = document.getElementById(`${section}-grid`);
+  const cards = getItems(section);
+  grid.innerHTML = '';
+  cards.forEach(card => {
+    const el = buildCard(card, section);
+    grid.appendChild(el);
+  });
+}
+
+function buildCard(card, section) {
+  const div = document.createElement('div');
+  const doneItems = (state[card.id] || []);
+  const pct = card.items.length ? Math.round((doneItems.length / card.items.length) * 100) : 0;
+  div.className = `topic-card${pct === 100 ? ' completed' : ''}`;
+  div.dataset.cardId = card.id;
+
+  const badgeClass = { weekly: 'badge-weekly', monthly: 'badge-monthly', both: 'badge-both' };
+
+  div.innerHTML = `
+    <div class="card-header">
+      <div class="card-title">${pct === 100 ? '✅ ' : ''}${card.title}</div>
+      <span class="card-badge ${badgeClass[card.badge]}">${card.badge}</span>
+    </div>
+    <ul class="checklist">
+      ${card.items.map((item, i) => `
+        <li class="${doneItems.includes(i) ? 'done' : ''}" data-idx="${i}" data-card="${card.id}">
+          <div class="check-box"><span class="check-icon">✓</span></div>
+          <span class="check-label">${item}</span>
+        </li>
+      `).join('')}
+    </ul>
+    <div class="card-progress">
+      <div class="card-progress-track">
+        <div class="card-progress-fill" style="width:${pct}%"></div>
+      </div>
+      <div class="card-pct">${pct}%</div>
+    </div>
+  `;
+
+  div.querySelectorAll('.checklist li').forEach(li => {
+    li.addEventListener('click', () => toggleItem(li, card.id, section, div));
+  });
+
+  return div;
+}
+
+function toggleItem(li, cardId, section, cardEl) {
+  const idx = parseInt(li.dataset.idx);
+  if (!state[cardId]) state[cardId] = [];
+  const arr = state[cardId];
+  const pos = arr.indexOf(idx);
+  if (pos === -1) arr.push(idx);
+  else arr.splice(pos, 1);
+  saveState();
+
+  li.classList.toggle('done', arr.includes(idx));
+  li.classList.add('pop');
+  setTimeout(() => li.classList.remove('pop'), 250);
+
+  // Update card progress
+  const card = findCard(cardId);
+  const pct = card ? Math.round((arr.length / card.items.length) * 100) : 0;
+  const fill = cardEl.querySelector('.card-progress-fill');
+  const pctEl = cardEl.querySelector('.card-pct');
+  if (fill) fill.style.width = pct + '%';
+  if (pctEl) pctEl.textContent = pct + '%';
+
+  const title = cardEl.querySelector('.card-title');
+  if (pct === 100) {
+    cardEl.classList.add('completed');
+    title.textContent = '✅ ' + (card?.title || '');
+  } else {
+    cardEl.classList.remove('completed');
+    title.textContent = card?.title || '';
+  }
+
+  updateStats();
+  markTodayActive();
+}
+
+function findCard(id) {
+  for (const sec of Object.values(DATA)) {
+    for (const list of [sec.weekly || [], sec.monthly || []]) {
+      const found = list.find(c => c.id === id);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function getAllCards(section) {
+  const d = DATA[section];
+  return [...(d.weekly || []), ...(d.monthly || [])];
+}
+
+function sectionProgress(section) {
+  const cards = getAllCards(section);
+  let total = 0, done = 0;
+  cards.forEach(c => {
+    total += c.items.length;
+    done += (state[c.id] || []).length;
+  });
+  return total ? Math.round((done / total) * 100) : 0;
+}
+
+function totalCompleted() {
+  let done = 0;
+  Object.values(DATA).forEach(sec => {
+    [...(sec.weekly || []), ...(sec.monthly || [])].forEach(c => {
+      done += (state[c.id] || []).length;
+    });
+  });
+  return done;
+}
+
+function masterProgress() {
+  let total = 0, done = 0;
+  Object.values(DATA).forEach(sec => {
+    [...(sec.weekly || []), ...(sec.monthly || [])].forEach(c => {
+      total += c.items.length;
+      done += (state[c.id] || []).length;
+    });
+  });
+  return total ? Math.round((done / total) * 100) : 0;
+}
+
+function updateStats() {
+  document.getElementById('statTotal').textContent = totalCompleted();
+  document.getElementById('statDSA').textContent = sectionProgress('dsa') + '%';
+  document.getElementById('statSD').textContent = sectionProgress('systemdesign') + '%';
+  document.getElementById('statJava').textContent = (Math.round((sectionProgress('java') + sectionProgress('database') + sectionProgress('os') + sectionProgress('networking')) / 4)) + '%';
+  const mp = masterProgress();
+  document.getElementById('masterPct').textContent = mp + '%';
+  document.getElementById('masterFill').style.width = mp + '%';
+}
+
+// ============================================================
+// WEEK STRIP
+// ============================================================
+function buildWeekStrip() {
+  const strip = document.getElementById('weekStrip');
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const today = new Date();
+  const activity = JSON.parse(localStorage.getItem('devprep_activity') || '{}');
+  strip.innerHTML = '';
+  for (let i = -3; i <= 3; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const key = d.toISOString().slice(0, 10);
+    const isToday = i === 0;
+    const div = document.createElement('div');
+    div.className = `week-day${isToday ? ' today' : ''}${activity[key] ? ' has-activity' : ''}`;
+    div.innerHTML = `
+      <div class="wd-name">${days[d.getDay()]}</div>
+      <div class="wd-num">${d.getDate()}</div>
+      <div class="wd-dot"></div>
+    `;
+    strip.appendChild(div);
+  }
+}
+
+function markTodayActive() {
+  const key = new Date().toISOString().slice(0, 10);
+  const activity = JSON.parse(localStorage.getItem('devprep_activity') || '{}');
+  activity[key] = true;
+  localStorage.setItem('devprep_activity', JSON.stringify(activity));
+  buildWeekStrip();
+  updateStreak();
+}
+
+function updateStreak() {
+  const activity = JSON.parse(localStorage.getItem('devprep_activity') || '{}');
+  let streak = 0;
+  const d = new Date();
+  while (true) {
+    const key = d.toISOString().slice(0, 10);
+    if (activity[key]) { streak++; d.setDate(d.getDate() - 1); }
+    else break;
+  }
+  document.getElementById('streakCount').textContent = streak;
+}
+
+// ============================================================
+// TABS & VIEWS
+// ============================================================
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    activeSection = btn.dataset.section;
+    document.getElementById(`section-${activeSection}`).classList.add('active');
+    renderCurrentSection();
+    syncViewToggle();
+  });
+});
+
+function syncViewToggle() {
+  const sec = document.getElementById(`section-${activeSection}`);
+  const btns = sec?.querySelectorAll('.view-btn');
+  if (!btns) return;
+  btns.forEach(b => b.classList.toggle('active', b.dataset.view === currentView[activeSection]));
+}
+
+document.querySelectorAll('.view-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const sec = btn.closest('.section').id.replace('section-', '');
+    currentView[sec] = btn.dataset.view;
+    btn.closest('.view-toggle').querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderGrid(sec);
+  });
+});
+
+document.querySelectorAll('.reset-section').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const sec = btn.dataset.reset;
+    if (!confirm(`Reset all progress for this section?`)) return;
+    getAllCards(sec).forEach(c => { state[c.id] = []; });
+    saveState();
+    renderGrid(sec);
+    updateStats();
+  });
+});
+
+function renderCurrentSection() { renderGrid(activeSection); }
+
+// ============================================================
+// THEME
+// ============================================================
+const themeBtn = document.getElementById('themeBtn');
+themeBtn.addEventListener('click', () => {
+  const cur = document.documentElement.dataset.theme;
+  document.documentElement.dataset.theme = cur === 'dark' ? 'light' : 'dark';
+  themeBtn.textContent = cur === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('devprep_theme', document.documentElement.dataset.theme);
+});
+const savedTheme = localStorage.getItem('devprep_theme');
+if (savedTheme) {
+  document.documentElement.dataset.theme = savedTheme;
+  themeBtn.textContent = savedTheme === 'light' ? '☀️' : '🌙';
+}
+
+// ============================================================
+// INIT
+// ============================================================
+buildWeekStrip();
+updateStreak();
+renderGrid('dsa');
+updateStats();
+</script>
+</body>
+</html>
